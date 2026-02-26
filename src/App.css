@@ -30,8 +30,8 @@ body {
 
 #main-canvas {
   justify-self: center;
-  width: 70%;
-  height: 40%;
-  background-color: #fff;
+  width: 1280px;
+  height: 720px;
+  background-color: linear-gradient(to bottom, #020917, #101725);
   display: block; /* Prevent scrollbars */
 }
