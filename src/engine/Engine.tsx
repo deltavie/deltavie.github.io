@@ -6,12 +6,13 @@ import { Camera } from './Camera';
 var MainCamera: Camera = new Camera();
 
 // Main export class.
-export class Engine {
+export class EngineObj {
     // Engine parameters.
     deltaTime: number;
     private lastTimestamp: number = 0;;
     pause: boolean;
     engineTimerId: number;
+    mouse: ReturnType<typeof useMouse> | null = null;
 
     // Objects.
     private gameObjects: GameObject[];
@@ -30,8 +31,9 @@ export class Engine {
 
     // Run the engine.
     Clock(mouse: ReturnType<typeof useMouse>, canvas: HTMLCanvasElement, timestamp: DOMHighResTimeStamp){
-        this.deltaTime = (timestamp - this.lastTimestamp)/1000;
+        this.deltaTime = timestamp - this.lastTimestamp;
         this.lastTimestamp = timestamp;
+        this.mouse = mouse;
         this.Logic(mouse);
         this.Render(canvas);
     }
@@ -89,6 +91,7 @@ export class Engine {
         this.objectsToDelete.push(object);
     }
 }
+export const Engine: EngineObj = new EngineObj(); // Export an engine to use.
 
 // Render objects function.
 function RenderGameObjects(ctx: CanvasRenderingContext2D, gameObjects: [GameObject], camera: Camera){
@@ -96,13 +99,14 @@ function RenderGameObjects(ctx: CanvasRenderingContext2D, gameObjects: [GameObje
     var cameraTransform = camera.transform;
     for(var i=0; i<gameObjects.length; i++){
         var obj = gameObjects[i];
-        if(!obj.visible || !obj.sprite) continue; // Do not render invisible/missing sprite.
+        if(!obj.visible || !obj.spriteImage) continue; // Do not render invisible/missing sprite.
         var transform = obj.transform;
+        var sprite = obj.sprite;
         ctx.drawImage
         (
-            obj.sprite as HTMLImageElement, 
-            transform.sX, transform.sY, transform.sWidth, transform.sHeight, 
-            transform.x-transform.width/2-cameraTransform.x, transform.y-transform.height/2-cameraTransform.y, transform.width, transform.height
+            obj.spriteImage as HTMLImageElement, 
+            sprite.sX, sprite.sY, sprite.sWidth, sprite.sHeight, 
+            transform.x-sprite.width/2-cameraTransform.x, transform.y-sprite.height/2-cameraTransform.y, sprite.width, sprite.height
         )
         continue;
     }

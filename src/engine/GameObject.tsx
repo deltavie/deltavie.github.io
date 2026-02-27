@@ -1,16 +1,22 @@
+import { SpriteAnimationController } from "../components/SpriteAnimationController";
+
 interface Transform {
-    // Destination transform.
+    // Position.
     x: number;
     y: number;
+    // Layer.
+    zIndex: number;
+}
+
+interface Sprite {
+    // Destination size.
     width: number;
     height: number;
-    // Source transform.
+    // Source size.
     sX: number;
     sY: number;
     sWidth: number;
     sHeight: number;
-    // Layer.
-    zIndex: number;
 }
 
 export class GameObject{
@@ -21,16 +27,18 @@ export class GameObject{
     transform: Transform = {
         x: 0,
         y: 0,
+        zIndex: 0,
+    }
+    // Sprite.
+    sprite: Sprite = {
         width: 0,
         height: 0,
         sX: 0,
         sY: 0,
         sWidth: 0,
         sHeight: 0,
-        zIndex: 0,
     }
-    // Sprite.
-    sprite: HTMLImageElement | null = null;
+    spriteImage: HTMLImageElement | null = null;
 
     /// Default constructor.
     constructor(){
