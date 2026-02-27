@@ -6,6 +6,9 @@ export default defineConfig({
   output: {
     assetPrefix: '/deltavie.github.io/'
   },
+  html: {
+    title: 'deltaive.github.io'
+  },
   plugins: [pluginReact()],
   testEnvironment: 'happy-dom',
   setupFiles: ['./tests/rstest.setup.ts'],
