@@ -2,6 +2,7 @@ import {useMouse} from 'react-use';
 
 import { GameObject } from './GameObject';
 import { Camera } from './Camera';
+import { webglRenderer } from './webgl/webglRenderer';
 
 var MainCamera: Camera = new Camera();
 
@@ -13,6 +14,9 @@ export class EngineObj {
     pause: boolean;
     engineTimerId: number;
     mouse: ReturnType<typeof useMouse> | null = null;
+
+    // Renderer.
+    renderer: webglRenderer = new webglRenderer();
 
     // Objects.
     private gameObjects: GameObject[];
@@ -27,21 +31,25 @@ export class EngineObj {
         this.gameObjects = [];
         this.objectsToInstantiate = [];
         this.objectsToDelete = [];
+        MainCamera.transform.position.z = 5;
+    }
+
+    // Initialize the engine.
+    Initialize(canvas: HTMLCanvasElement){
+        this.renderer.Initialize(canvas);
     }
 
     // Run the engine.
-    Clock(mouse: ReturnType<typeof useMouse>, canvas: HTMLCanvasElement, timestamp: DOMHighResTimeStamp){
+    Clock(mouse: ReturnType<typeof useMouse>, timestamp: DOMHighResTimeStamp){
         this.deltaTime = timestamp - this.lastTimestamp;
         this.lastTimestamp = timestamp;
         this.mouse = mouse;
         this.Logic(mouse);
-        this.Render(canvas);
+        this.Render();
     }
 
     // Logic update.
     private Logic(mouse: ReturnType<typeof useMouse>){
-        mouseX = mouse.elX;
-        mouseY = mouse.elY;
         // Run object logic.
         this.gameObjects.forEach((obj) => {
             obj.Update();
@@ -54,8 +62,8 @@ export class EngineObj {
             }
             this.objectsToInstantiate = [];
             var sortedGameObjects = this.gameObjects.sort((n1,n2) => {
-                if (n1.transform.zIndex > n2.transform.zIndex) return 1;
-                if (n1.transform.zIndex < n2.transform.zIndex) return -1;
+                if (n1.transform.position.z > n2.transform.position.z) return 1;
+                if (n1.transform.position.z < n2.transform.position.z) return -1;
                 return 0;
             }); // Sort by layers.
             this.gameObjects = sortedGameObjects;
@@ -73,12 +81,11 @@ export class EngineObj {
     }
 
     // Render update.
-    private Render(canvas: HTMLCanvasElement){
-        const ctx = canvas.getContext("2d");
-        if(!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear.
-        RenderGameObjects(ctx, this.gameObjects as [GameObject], MainCamera); // Render objects.
-        RenderLine(ctx);
+    private Render(){
+        this.renderer.Render(this.gameObjects, MainCamera);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear.
+        //RenderGameObjects(ctx, this.gameObjects as [GameObject], MainCamera); // Render objects.
+        //RenderLine(ctx);
     }
 
     // Add game object.
@@ -94,19 +101,19 @@ export class EngineObj {
 export const Engine: EngineObj = new EngineObj(); // Export an engine to use.
 
 // Render objects function.
-function RenderGameObjects(ctx: CanvasRenderingContext2D, gameObjects: [GameObject], camera: Camera){
+function RenderGameObjects(ctx: CanvasRenderingContext2D, gameObjects: GameObject[], camera: Camera){
     if(gameObjects.length <= 0) return; // Do not render empty lists.
     var cameraTransform = camera.transform;
     for(var i=0; i<gameObjects.length; i++){
         var obj = gameObjects[i];
-        if(!obj.visible || !obj.spriteImage) continue; // Do not render invisible/missing sprite.
+        if(!obj.visible || !obj.spriteTexture) continue; // Do not render invisible/missing sprite.
         var transform = obj.transform;
         var sprite = obj.sprite;
         ctx.drawImage
         (
-            obj.spriteImage as HTMLImageElement, 
+            obj.spriteTexture as HTMLImageElement, 
             sprite.sX, sprite.sY, sprite.sWidth, sprite.sHeight, 
-            transform.x-sprite.width/2-cameraTransform.x, transform.y-sprite.height/2-cameraTransform.y, sprite.width, sprite.height
+            transform.position.x-128/2-cameraTransform.position.x, transform.position.y-128/2-cameraTransform.position.y, 128, 128
         )
         continue;
     }

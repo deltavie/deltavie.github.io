@@ -10,7 +10,6 @@ var MainEngine = Engine;
 
 // Scene.
 var mainScene: defaultScene = new defaultScene();
-mainScene.Load(MainEngine);
 
 // References.
 var canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -21,18 +20,20 @@ const App = () => {
   canvasRef = React.useRef<HTMLCanvasElement>(null) as React.RefObject<HTMLCanvasElement>;
   mouse = useMouse(canvasRef);
 
-  // Load scene.
+  // Startup engine.
   React.useEffect(() => {
-    mainScene.Load(MainEngine);
-    return mainScene.Clear(MainEngine);
+    // Init engine.
+    MainEngine.Initialize(canvasRef.current);
+    // Load scene.
+    mainScene.Load();
   }, [])
 
-  // Engine.
+  // Engine loop.
   React.useEffect(() => {
     if(MainEngine.pause){
       // Engine loop.
       const nextFrame = (timestamp: DOMHighResTimeStamp) => {
-        MainEngine.Clock(mouse, canvasRef.current, timestamp);
+        MainEngine.Clock(mouse, timestamp);
         MainEngine.engineTimerId = requestAnimationFrame(nextFrame);
       }
       // Call first engine loop.

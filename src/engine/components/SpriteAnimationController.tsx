@@ -1,5 +1,5 @@
-import { Engine } from "../engine/Engine";
-import type { GameObject } from "../engine/GameObject";
+import { Engine } from "../Engine";
+import type { GameObject } from "../GameObject";
 import type { SpriteAnimation } from "./SpriteAnimation";
 
 export class SpriteAnimationController{
@@ -18,8 +18,7 @@ export class SpriteAnimationController{
         this.elapsedTime = 0;
         this.currentFrameIndex = 0;
         // Set object sprite.
-        if(!this.myObject.spriteImage) this.myObject.spriteImage = new Image();
-        this.myObject.spriteImage.src = animation.spritesheet as string;
+        this.myObject.sprite.texture = animation.spritesheet as string;
          // TEMP SET FIRST FRAME!!!
         this.myObject.sprite.sX = 0; // Source position.
         this.myObject.sprite.sY = 0;

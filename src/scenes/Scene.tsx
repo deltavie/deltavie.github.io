@@ -7,12 +7,12 @@ export class Scene {
         this.gameObjects = [];
     }
     // Load and clear scene.
-    Load(Engine: Engine){
+    Load(){
         this.gameObjects.forEach(obj => {
             Engine.Instantiate(obj);
         });
     }
-    Clear(Engine: Engine){
+    Clear(){
         this.gameObjects.forEach(obj => {
             Engine.Destroy(obj);
         });

@@ -1,6 +1,5 @@
 import { GameObject } from "../engine/GameObject";
-import { SpriteAnimationController } from "../components/SpriteAnimationController";
-import { Engine } from "../engine/Engine";
+import { SpriteAnimationController } from "../engine/components/SpriteAnimationController";
 
 export class Character extends GameObject{
     // Components
@@ -12,6 +11,6 @@ export class Character extends GameObject{
 
     Update(): void {
         super.Update();
-        this.AnimController.Update(Engine.deltaTime);
+        this.AnimController.Update();
     }
 }

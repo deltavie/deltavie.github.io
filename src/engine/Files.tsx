@@ -4,4 +4,4 @@ function importAll(r: Rspack.Context) {
     r.keys().map(item => { images[item.replace('./', '')] = r(item); });
     return images;
 }
-export const images = importAll(require.context('../images', false, '/\.png/'));
+export const images: {[key:string]: string} = importAll(require.context('../images', false, '/\.png/'));

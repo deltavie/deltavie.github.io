@@ -1,22 +1,9 @@
-import { SpriteAnimationController } from "../components/SpriteAnimationController";
+import type { Sprite } from "./components/Sprite";
+import type { Vec4 } from "./dataTypes/Vectors";
 
 interface Transform {
-    // Position.
-    x: number;
-    y: number;
-    // Layer.
-    zIndex: number;
-}
-
-interface Sprite {
-    // Destination size.
-    width: number;
-    height: number;
-    // Source size.
-    sX: number;
-    sY: number;
-    sWidth: number;
-    sHeight: number;
+    position: Vec4;
+    rotation: Vec4;
 }
 
 export class GameObject{
@@ -25,20 +12,36 @@ export class GameObject{
     visible: boolean;
     // Transfrom.
     transform: Transform = {
-        x: 0,
-        y: 0,
-        zIndex: 0,
+        position: {x:0, y:0, z:0, w:0},
+        rotation: {x:0, y:0, z:0, w:0}
     }
     // Sprite.
     sprite: Sprite = {
-        width: 0,
-        height: 0,
+        position: {x:0, y:0, z:0, w:0},
+        scale: {x:0, y:0, z:0, w:0},
+        rotation: {x:0, y:0, z:0, w:0},
+        flipped: false,
+        verticies: [
+            -1.0, -1.0, 0,
+            1.0, -1.0, 0,
+            1.0, 1.0, 0,
+            -1.0, 1.0, 0,
+        ], // square.
+        indicies:  [
+            0,1,2,0,2,3
+        ], // defining triangles from verticies.
+        textureCoord:[
+            0.0,0.0,
+            0.03,0.0,
+            0.03,1.0,
+            0.0,1.0
+        ], // Defining texture coordinates.
         sX: 0,
         sY: 0,
         sWidth: 0,
         sHeight: 0,
+        texture: null
     }
-    spriteImage: HTMLImageElement | null = null;
 
     /// Default constructor.
     constructor(){

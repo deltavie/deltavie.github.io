@@ -7,5 +7,8 @@ export class defaultScene extends Scene{
         // New character.
         var c01: gameObjects.Character = new gameObjects.Character01();
         this.gameObjects.push(c01)
+        var c02: gameObjects.Character = new gameObjects.Character01();
+        c02.transform.position.x += 1;
+        this.gameObjects.push(c02)
     }
 }
