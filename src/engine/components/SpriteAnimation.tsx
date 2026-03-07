@@ -1,20 +1,18 @@
 // How to slice up spritesheet.
-interface SheetSettings {
+interface SpriteSheetSettings {
     // Slicing.
-    spritesPerRow: number;
+    rows: number;
+    cols: number;
     spriteCount: number;
-    // Sizing.
-    sWidth: number;
-    sHeight: number;
 }
 // Frames in animation.
 interface Frame{
     index: number;
     duration: number;
 }
-
+// Sprite animation interface.
 export interface SpriteAnimation {
     spritesheet: string | null;
-    sheetSettings: SheetSettings;
+    sheetSettings: SpriteSheetSettings;
     animation: Frame[];
 }

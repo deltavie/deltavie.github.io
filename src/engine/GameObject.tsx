@@ -36,10 +36,6 @@ export class GameObject{
             0.03,1.0,
             0.0,1.0
         ], // Defining texture coordinates.
-        sX: 0,
-        sY: 0,
-        sWidth: 0,
-        sHeight: 0,
         texture: null
     }
 

@@ -19,11 +19,6 @@ export class SpriteAnimationController{
         this.currentFrameIndex = 0;
         // Set object sprite.
         this.myObject.sprite.texture = animation.spritesheet as string;
-         // TEMP SET FIRST FRAME!!!
-        this.myObject.sprite.sX = 0; // Source position.
-        this.myObject.sprite.sY = 0;
-        this.myObject.sprite.sWidth = this.currentAnimation.sheetSettings.sWidth; // Source size.
-        this.myObject.sprite.sHeight = this.currentAnimation.sheetSettings.sHeight;
     }
 
     // Call in update loop to animate.
@@ -43,10 +38,17 @@ export class SpriteAnimationController{
             // We can change frame now.
             this.currentFrameIndex++;
             this.elapsedTime = 0;
-            this.myObject.sprite.sX = (this.currentFrameIndex % this.currentAnimation.sheetSettings.spritesPerRow) * this.currentAnimation.sheetSettings.sWidth; // Source position.
-            this.myObject.sprite.sY = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.spritesPerRow) * this.currentAnimation.sheetSettings.sWidth;
-            this.myObject.sprite.sWidth = this.currentAnimation.sheetSettings.sWidth; // Source size.
-            this.myObject.sprite.sHeight = this.currentAnimation.sheetSettings.sHeight;
+            var width = 1/this.currentAnimation.sheetSettings.cols;
+            var height = 1/this.currentAnimation.sheetSettings.rows;
+            var x = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols) * width;
+            var y = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols) * height;
+            this.myObject.sprite.textureCoord = 
+            [
+                x, y,
+                x+width, y,
+                x+width, y+height,
+                x, y+height
+            ]
         }
     }
 }

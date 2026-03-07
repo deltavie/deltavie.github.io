@@ -9,10 +9,9 @@ export class Character01 extends Character{
     anim_idle0: SpriteAnimation = {
         spritesheet: images["idle_0.gif_31_spritesheet.png"],
         sheetSettings: {
-            spritesPerRow: 31,
-            spriteCount: 31,
-            sWidth: 512,
-            sHeight: 512,
+            rows: 1,
+            cols: 31,
+            spriteCount: 31
         },
         animation:[
         ],
@@ -34,10 +33,13 @@ export class Character01 extends Character{
         this.elapsedtime += Engine.deltaTime/1000;
         if(this.direction){
             this.transform.position.x = Math.sin(this.elapsedtime);
-            this.transform.position.y = Math.cos(this.elapsedtime);
+            //this.transform.position.y = Math.cos(this.elapsedtime);
+            this.transform.position.z = Math.cos(this.elapsedtime);
         }else{
             this.transform.position.x = -Math.sin(this.elapsedtime);
-            this.transform.position.y = -Math.cos(this.elapsedtime);
+            //this.transform.position.y = -Math.cos(this.elapsedtime);
+            this.transform.position.z = -Math.cos(this.elapsedtime);
+            this.transform.rotation.y = Math.PI;
         }
         //this.transform.rotation.x = Math.sin(this.elapsedtime)*3;
         //this.transform.rotation.y = Math.cos(this.elapsedtime)*3;

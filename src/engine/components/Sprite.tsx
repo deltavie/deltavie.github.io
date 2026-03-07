@@ -9,11 +9,6 @@ export interface Sprite {
     verticies: number[]; // Vertex positions for polygon.
     indicies: number[]; // Edges for polygon.
     textureCoord: number[]; // Verticies for texture.
-    // Source.
-    sX: number;
-    sY: number;
-    sWidth: number;
-    sHeight: number;
     // Texture.
     texture: string | null;
 }

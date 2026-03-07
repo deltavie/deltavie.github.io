@@ -26,8 +26,12 @@ const fsSource = `
 
     void main(void) {
       gl_FragColor = texture2D(uSampler, vTextureCoord);
+      if(gl_FragColor == vec4(0.000, 0.000, 0.000, 0.000)) discard;
     }
   `;
+// if(gl_FragColor == vec4(0.000, 0.000, 0.000, 0.000)) discard;
+// texture transparency hack, can't have semi-transparent but can have fully transparent
+// need to find a solution for semi transparency
 
 // Collect all the info needed to use the shader program.
 // Look up which attribute our shader program is using
