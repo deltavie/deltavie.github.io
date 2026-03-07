@@ -44,12 +44,12 @@ export class EngineObj {
         this.deltaTime = timestamp - this.lastTimestamp;
         this.lastTimestamp = timestamp;
         this.mouse = mouse;
-        this.Logic(mouse);
+        this.Logic();
         this.Render();
     }
 
     // Logic update.
-    private Logic(mouse: ReturnType<typeof useMouse>){
+    private Logic(){
         // Run object logic.
         this.gameObjects.forEach((obj) => {
             obj.Update();
@@ -83,9 +83,6 @@ export class EngineObj {
     // Render update.
     private Render(){
         this.renderer.Render(this.gameObjects, MainCamera);
-        //ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear.
-        //RenderGameObjects(ctx, this.gameObjects as [GameObject], MainCamera); // Render objects.
-        //RenderLine(ctx);
     }
 
     // Add game object.

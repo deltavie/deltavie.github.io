@@ -11,6 +11,8 @@ export class Character01 extends Character{
         sheetSettings: {
             rows: 1,
             cols: 31,
+            width: 512,
+            height: 512,
             spriteCount: 31
         },
         animation:[
@@ -22,6 +24,8 @@ export class Character01 extends Character{
         super();
         if(count%2==0) this.direction = true;
         count++;
+        // Load animation.
+        this.AnimController.Load(this.anim_idle0);
     }
 
     elapsedtime = 0;
@@ -33,16 +37,11 @@ export class Character01 extends Character{
         this.elapsedtime += Engine.deltaTime/1000;
         if(this.direction){
             this.transform.position.x = Math.sin(this.elapsedtime);
-            //this.transform.position.y = Math.cos(this.elapsedtime);
             this.transform.position.z = Math.cos(this.elapsedtime);
         }else{
             this.transform.position.x = -Math.sin(this.elapsedtime);
-            //this.transform.position.y = -Math.cos(this.elapsedtime);
             this.transform.position.z = -Math.cos(this.elapsedtime);
             this.transform.rotation.y = Math.PI;
         }
-        //this.transform.rotation.x = Math.sin(this.elapsedtime)*3;
-        //this.transform.rotation.y = Math.cos(this.elapsedtime)*3;
-        //this.transform.rotation.z = Math.tan(this.elapsedtime)*3;
     }
 }

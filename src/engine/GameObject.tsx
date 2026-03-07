@@ -32,11 +32,12 @@ export class GameObject{
         ], // defining triangles from verticies.
         textureCoord:[
             0.0,0.0,
-            0.03,0.0,
-            0.03,1.0,
+            1.0,0.0,
+            1.0,1.0,
             0.0,1.0
         ], // Defining texture coordinates.
-        texture: null
+        textureKey: null,
+        textureImage: null,
     }
 
     /// Default constructor.

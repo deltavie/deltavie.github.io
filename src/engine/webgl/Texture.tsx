@@ -3,13 +3,14 @@
 var textureLibrary: {[key:string]: WebGLTexture} = {};
 var DefaultTexture:WebGLTexture | null = null;
 
-// Return webgl texture based on key.
-export function Texture(glContext: WebGL2RenderingContext, key: string): WebGLTexture | null{
+// Return webgl texture based on key, else load image into it.
+export function Texture(glContext: WebGL2RenderingContext, key: string, image: HTMLImageElement | ImageBitmap | null): WebGLTexture | null{
     if(key in textureLibrary){
         return textureLibrary[key];
     }else{
         // Try to load texture.
-        const texture = loadTexture(glContext, key)
+        if(!image) return null;
+        const texture = loadTexture(glContext, image)
         if(!texture) return null;
         textureLibrary[key] = texture;
         return texture;
@@ -47,7 +48,7 @@ export function GetDefaultTexture(glContext: WebGL2RenderingContext): WebGLTextu
 }
 
 // Initialize a texture and save it.
-function loadTexture(glContext: WebGL2RenderingContext, url: string): WebGLTexture{
+function loadTexture(glContext: WebGL2RenderingContext, image: HTMLImageElement | ImageBitmap): WebGLTexture{
     const texture = glContext.createTexture();
     glContext.bindTexture(glContext.TEXTURE_2D, texture);
     // Create a texture with a single pixel while waiting for texture to load.
@@ -70,25 +71,24 @@ function loadTexture(glContext: WebGL2RenderingContext, url: string): WebGLTextu
         srcType,
         pixel
     )
-    // Load image.
-    const image = new Image();
-    image.onload = () => {
-        glContext.bindTexture(glContext.TEXTURE_2D, texture);
-        glContext.texImage2D(
-            glContext.TEXTURE_2D,
-            level,
-            internalFormat,
-            srcFormat,
-            srcType,
-            image
-        )
-    }
-    image.src = url;
+    // Bind image.
+    glContext.bindTexture(glContext.TEXTURE_2D, texture);
+    glContext.texImage2D(
+        glContext.TEXTURE_2D,
+        level,
+        internalFormat,
+        srcFormat,
+        srcType,
+        image
+    )
     // I don't know what is fucking wrong with the mipmaps
     // WebGL1 requirements for power of 2 images.
-    // if(isPowerOf2(image.width)&&isPowerOf2(image.height)){
-    //     glContext.generateMipmap(glContext.TEXTURE_2D);
-    // }else{
+    //if(isPowerOf2(image.width)&&isPowerOf2(image.height)){
+    //    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_WRAP_S, glContext.CLAMP_TO_EDGE);
+    //    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_WRAP_T, glContext.CLAMP_TO_EDGE);
+    //    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MIN_FILTER, glContext.LINEAR_MIPMAP_LINEAR);
+    //    glContext.generateMipmap(glContext.TEXTURE_2D);
+    //}else{
         // Turn off mips and clamp texture to edge.
         glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_WRAP_S, glContext.CLAMP_TO_EDGE);
         glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_WRAP_T, glContext.CLAMP_TO_EDGE);

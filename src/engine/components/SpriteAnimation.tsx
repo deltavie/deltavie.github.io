@@ -3,6 +3,8 @@ interface SpriteSheetSettings {
     // Slicing.
     rows: number;
     cols: number;
+    width: number;
+    height: number;
     spriteCount: number;
 }
 // Frames in animation.

@@ -91,6 +91,9 @@ export class webglRenderer{
             modelViewMatrix: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uModelViewMatrix"),
             uSampler: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uSampler"),
         };
+        // Enable attribute arrays
+        this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
+        this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
     }
     // Render loop.
     Render(gameObjects: GameObject[], camera: GameObject){
@@ -174,7 +177,7 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
     const fieldOfView = (45 * Math.PI) / 180; // in radians
-    const aspect = glContext.canvas.clientWidth / glContext.canvas.clientHeight;
+    const aspect = glContext.canvas.width / glContext.canvas.height;
     const zNear = 0.1;
     const zFar = 100.0;
     const projectionMatrix = mat4.create();
@@ -187,8 +190,8 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
         const buffers = initBuffers(glContext, gameObject);
         // Load texture.
         var texture = null;
-        if(gameObject.sprite.texture){
-            texture = Texture(glContext, gameObject.sprite.texture);
+        if(gameObject.sprite.textureKey){
+            texture = Texture(glContext, gameObject.sprite.textureKey, gameObject.sprite.textureImage);
         }else{
             texture = GetDefaultTexture(glContext);
         }
@@ -292,7 +295,7 @@ function setPositionAttribute(glContext: WebGL2RenderingContext, buffers: any, p
         stride,
         offset,
     );
-    glContext.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+    //glContext.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 }
 // Make position buffer for object.
 function initPositionBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObject){
@@ -351,7 +354,7 @@ function setTextureAttribute(glContext: WebGL2RenderingContext, buffers: any, pr
     stride,
     offset,
   );
-  glContext.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+  //glContext.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
 }
 // Make texture buffer.
 function initTextureBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObject) {

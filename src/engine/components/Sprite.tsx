@@ -10,5 +10,6 @@ export interface Sprite {
     indicies: number[]; // Edges for polygon.
     textureCoord: number[]; // Verticies for texture.
     // Texture.
-    texture: string | null;
+    textureKey: string | null;
+    textureImage: ImageBitmap | null;
 }
