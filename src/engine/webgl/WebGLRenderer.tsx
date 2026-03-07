@@ -1,4 +1,5 @@
 import type { GameObject } from "../GameObject.js";
+// @ts-ignore this file SHOULD be imported fine
 import {vec3, vec4, mat4} from "./gl-matrix-min.js"
 import { GetDefaultTexture, Texture } from "./Texture.js";
 

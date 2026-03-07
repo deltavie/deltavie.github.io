@@ -99,36 +99,3 @@ export class EngineObj {
     }
 }
 export const Engine: EngineObj = new EngineObj(); // Export an engine to use.
-
-// Render objects function.
-function RenderGameObjects(ctx: CanvasRenderingContext2D, gameObjects: GameObject[], camera: Camera){
-    if(gameObjects.length <= 0) return; // Do not render empty lists.
-    var cameraTransform = camera.transform;
-    for(var i=0; i<gameObjects.length; i++){
-        var obj = gameObjects[i];
-        if(!obj.visible || !obj.spriteTexture) continue; // Do not render invisible/missing sprite.
-        var transform = obj.transform;
-        var sprite = obj.sprite;
-        ctx.drawImage
-        (
-            obj.spriteTexture as HTMLImageElement, 
-            sprite.sX, sprite.sY, sprite.sWidth, sprite.sHeight, 
-            transform.position.x-128/2-cameraTransform.position.x, transform.position.y-128/2-cameraTransform.position.y, 128, 128
-        )
-        continue;
-    }
-}
-
-var mouseX = 0;
-var mouseY = 0;
-var lastX = 0;
-var lastY = 0;
-function RenderLine(ctx: CanvasRenderingContext2D) {
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(mouseX, mouseY);
-    ctx.strokeStyle = "white";
-    ctx.stroke();
-    lastX = mouseX;
-    lastY = mouseY;
-}
