@@ -2,7 +2,7 @@ import {useMouse} from 'react-use';
 
 import { GameObject } from './GameObject';
 import { Camera } from './Camera';
-import { webglRenderer } from './webgl/webglRenderer';
+import { webglRenderer } from './webgl/WebGLRenderer';
 
 var MainCamera: Camera = new Camera();
 
