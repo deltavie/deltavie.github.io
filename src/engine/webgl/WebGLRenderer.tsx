@@ -97,7 +97,7 @@ export class webglRenderer{
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
         // Get parameters.
-        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE);
+        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE)/4;
     }
     // Render loop.
     Render(gameObjects: GameObject[], camera: GameObject){

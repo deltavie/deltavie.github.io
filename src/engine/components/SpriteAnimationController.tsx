@@ -1,6 +1,6 @@
 import { Engine } from "../Engine";
 import type { GameObject } from "../GameObject";
-import { GetImage } from "../webgl/Images";
+import { GetImage, ResizeBitmapForTexture } from "../webgl/Images";
 import type { SpriteAnimation } from "./SpriteAnimation";
 
 export class SpriteAnimationController{
@@ -27,7 +27,7 @@ export class SpriteAnimationController{
     // We will load sheets starting from the top left going to the bottom right.
     Load(animation: SpriteAnimation){
         if(!animation.spritesheet) return; // No spritesheet.
-        //GetImage(`${animation.spritesheet}`, animation.spritesheet, 0, 0, animation.sheetSettings.cols*animation.sheetSettings.spriteWidth, animation.sheetSettings.rows*animation.sheetSettings.spriteHeight);
+        // GetImage(`${animation.spritesheet}`, animation.spritesheet, 0, 0, animation.sheetSettings.cols*animation.sheetSettings.spriteWidth, animation.sheetSettings.rows*animation.sheetSettings.spriteHeight, "flipY");
         // var MaxSize = Engine.renderer.MaxTextureSize;
         // // Calc number of segements to generate.
         // var width = animation.sheetSettings.cols * animation.sheetSettings.spriteWidth;
@@ -76,11 +76,27 @@ export class SpriteAnimationController{
             var spriteHeight = this.currentAnimation.sheetSettings.spriteHeight;
             var x = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols) * spriteWidth;
             var y = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols) * spriteHeight;
-            // Lazy textures, crop each sprite as an individual texture, results in more memory used.
+
             var image = GetImage(`${this.currentAnimation.spritesheet}`, this.currentAnimation.spritesheet as string, 0, 0, this.currentAnimation.sheetSettings.cols*this.currentAnimation.sheetSettings.spriteWidth, this.currentAnimation.sheetSettings.rows*this.currentAnimation.sheetSettings.spriteHeight, "flipY");
             if(!image) return;
-            this.myObject.sprite.textureImage = GetImage(`${this.currentAnimation.spritesheet}_${this.currentFrameIndex}`, image as ImageBitmap, x, y, spriteWidth, spriteHeight, "none");
-            this.myObject.sprite.textureKey = `${this.currentAnimation.spritesheet}_${this.currentFrameIndex}`;
+            this.myObject.sprite.textureImage = ResizeBitmapForTexture(`${this.currentAnimation.spritesheet}_tex`, image as ImageBitmap) as ImageBitmap;
+            this.myObject.sprite.textureKey = `${this.currentAnimation.spritesheet}_tex`;
+            var texWidth = 1/this.currentAnimation.sheetSettings.cols;
+            var texHeight = 1/this.currentAnimation.sheetSettings.rows;
+            var texX = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols) * texWidth;
+            var texY = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols) * texHeight;
+            this.myObject.sprite.textureCoord = 
+            [
+                texX, texY,
+                texX+texWidth, texY,
+                texX+texWidth, texY+texHeight,
+                texX, texY+texHeight
+            ]
+            // Lazy textures, crop each sprite as an individual texture, results in more memory used.
+            // var image = GetImage(`${this.currentAnimation.spritesheet}`, this.currentAnimation.spritesheet as string, 0, 0, this.currentAnimation.sheetSettings.cols*this.currentAnimation.sheetSettings.spriteWidth, this.currentAnimation.sheetSettings.rows*this.currentAnimation.sheetSettings.spriteHeight, "flipY");
+            // if(!image) return;
+            // this.myObject.sprite.textureImage = GetImage(`${this.currentAnimation.spritesheet}_${this.currentFrameIndex}`, image as ImageBitmap, x, y, spriteWidth, spriteHeight, "none");
+            // this.myObject.sprite.textureKey = `${this.currentAnimation.spritesheet}_${this.currentFrameIndex}`;
             // Find segement based on x,y position.
             // var MaxSize = Engine.renderer.MaxTextureSize;
             // var sheetWidth = this.currentAnimation.sheetSettings.cols * this.currentAnimation.sheetSettings.spriteWidth;
