@@ -46,6 +46,11 @@ export class GameObject{
         this.visible = true;
     }
 
+    // Logic when object is instantiated.
+    Instantiated(): void{
+
+    }
+
     // Logic update function.
     Update(): void{
         return;

@@ -59,14 +59,9 @@ export class EngineObj {
         if(this.objectsToInstantiate.length >= 1){
             for(var i=0; i<this.objectsToInstantiate.length;i++){
                 this.gameObjects.push(this.objectsToInstantiate[i]);
+                this.objectsToInstantiate[i].Instantiated();
             }
             this.objectsToInstantiate = [];
-            var sortedGameObjects = this.gameObjects.sort((n1,n2) => {
-                if (n1.transform.position.z > n2.transform.position.z) return 1;
-                if (n1.transform.position.z < n2.transform.position.z) return -1;
-                return 0;
-            }); // Sort by layers.
-            this.gameObjects = sortedGameObjects;
         }
         // Delete objects.
         if(this.objectsToDelete.length >= 1){

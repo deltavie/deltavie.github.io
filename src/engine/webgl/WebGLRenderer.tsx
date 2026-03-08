@@ -51,6 +51,7 @@ interface glProgramInfo{
 }
 // Main program.
 export class webglRenderer{
+    // GL parameters.
     glContext: WebGL2RenderingContext | null = null;
     programInfo: glProgramInfo = {
         shaderProgram: null,
@@ -64,6 +65,7 @@ export class webglRenderer{
             uSampler: null
         }
     }
+    MaxTextureSize: number = 4096; // When loading textures we cannot exceed this size.
     // Initial webgl instance.
     Initialize(canvas: HTMLCanvasElement){
         // Initialize the GL context
@@ -94,6 +96,8 @@ export class webglRenderer{
         // Enable attribute arrays
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
+        // Get parameters.
+        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE);
     }
     // Render loop.
     Render(gameObjects: GameObject[], camera: GameObject){
@@ -192,9 +196,8 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
         var texture = null;
         if(gameObject.sprite.textureKey){
             texture = Texture(glContext, gameObject.sprite.textureKey, gameObject.sprite.textureImage);
-        }else{
-            texture = GetDefaultTexture(glContext);
         }
+        if(!texture) texture = GetDefaultTexture(glContext); // fallback.
         // Create a new matrix for the object with the center as origin.
         const modelViewMatrix = mat4.create();
         // Move the object relative to the camera position.

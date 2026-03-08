@@ -11,8 +11,8 @@ export class Character01 extends Character{
         sheetSettings: {
             rows: 1,
             cols: 31,
-            width: 512,
-            height: 512,
+            spriteWidth: 512,
+            spriteHeight: 512,
             spriteCount: 31
         },
         animation:[
@@ -20,8 +20,7 @@ export class Character01 extends Character{
     };
 
     direction = false;
-    constructor(){
-        super();
+    Instantiated(){
         if(count%2==0) this.direction = true;
         count++;
         // Load animation.
