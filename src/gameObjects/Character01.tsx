@@ -11,9 +11,10 @@ export class Character01 extends Character{
         sheetSettings: {
             rows: 1,
             cols: 31,
-            spriteWidth: 512,
-            spriteHeight: 512,
-            spriteCount: 31
+            spriteWidth: 256,
+            spriteHeight: 256,
+            spriteCount: 31,
+            sprites:{},
         },
         animation:[
         ],

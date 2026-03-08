@@ -97,7 +97,7 @@ export class webglRenderer{
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
         // Get parameters.
-        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE)/4;
+        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE)/8;
     }
     // Render loop.
     Render(gameObjects: GameObject[], camera: GameObject){
@@ -194,9 +194,7 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
         const buffers = initBuffers(glContext, gameObject);
         // Load texture.
         var texture = null;
-        if(gameObject.sprite.textureKey){
-            texture = Texture(glContext, gameObject.sprite.textureKey, gameObject.sprite.textureImage);
-        }
+        if(gameObject.sprite.textureKey) texture = Texture(glContext, gameObject.sprite.textureKey, null);
         if(!texture) texture = GetDefaultTexture(glContext); // fallback.
         // Create a new matrix for the object with the center as origin.
         const modelViewMatrix = mat4.create();

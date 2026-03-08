@@ -6,6 +6,7 @@ interface SpriteSheetSettings {
     spriteWidth: number;
     spriteHeight: number;
     spriteCount: number;
+    sprites:{};
 }
 // Frames in animation.
 interface Frame{
