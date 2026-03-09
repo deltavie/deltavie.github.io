@@ -27,41 +27,27 @@ export class SpriteAnimationController{
     // We will load the spritesheet into individual sprite textures.
     Load(animation: SpriteAnimation){
         if(!animation.spritesheet) return; // No spritesheet.
-        if(!Engine.renderer.glContext) return; // No gl context.
         // Load whole spritesheet into memory.
-        var width = animation.sheetSettings.cols * animation.sheetSettings.spriteWidth;
-        var height = animation.sheetSettings.rows * animation.sheetSettings.spriteHeight;
-        LoadImage(
-            `${animation.spritesheet}`, 
-            animation.spritesheet, 
-            {
-                sourceX: 0, sourceY: 0,
-                width: width, height: height,
-                orientation: "flipY"
-            },
-            (image: ImageBitmap) => {
-                // Load sprites in sheet as individual textures.
-                for(var i=0; i < animation.sheetSettings.spriteCount; i++){
-                    var c = (i % animation.sheetSettings.cols);
-                    var r = Math.floor(i / animation.sheetSettings.cols);
-                    var key = `${animation.spritesheet}_${r}_${c}`;
-                    if(!Engine.renderer.glContext) continue;
-                    if(LoadTexture(Engine.renderer.glContext, key, null)) continue;
-                    var x = c*animation.sheetSettings.spriteWidth;
-                    var y = r*animation.sheetSettings.spriteHeight;
-                    var segmentWidth = animation.sheetSettings.spriteWidth;
-                    var segmentHeight = animation.sheetSettings.spriteHeight;
-                    Promise.all([
-                        createImageBitmap(image, x, y, segmentWidth, segmentHeight),
-                        c,
-                        r,
-                    ]).then((values) => { 
-                        var newkey = `${animation.spritesheet}_${values[2]}_${values[1]}`;
-                        LoadTexture(Engine.renderer.glContext, newkey, values[0])
-                    });
-                }
-            }
-        );
+        for(var i=0; i < animation.sheetSettings.spriteCount; i++){
+            var c = (i % animation.sheetSettings.cols);
+            var r = Math.floor(i / animation.sheetSettings.cols);
+            var key = `${animation.spritesheet}_${r}_${c}`;
+            if(GetImage(key)) continue;
+            var x = c*animation.sheetSettings.spriteWidth;
+            var y = r*animation.sheetSettings.spriteHeight;
+            var segmentWidth = animation.sheetSettings.spriteWidth;
+            var segmentHeight = animation.sheetSettings.spriteHeight;
+            LoadImage(
+                key, 
+                animation.spritesheet, 
+                {
+                    sourceX: x, sourceY: y,
+                    width: segmentWidth, height: segmentHeight,
+                    orientation: "flipY"
+                },
+                () => {}
+            );
+        }
     }
 
     // Call in update loop to animate.
@@ -84,7 +70,22 @@ export class SpriteAnimationController{
             // Calculate new frame.
             var c = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols);
             var r = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols);
+            var x = c*this.currentAnimation.sheetSettings.spriteWidth;
+            var y = r*this.currentAnimation.sheetSettings.spriteHeight;
+            var segmentWidth = this.currentAnimation.sheetSettings.spriteWidth;
+            var segmentHeight = this.currentAnimation.sheetSettings.spriteHeight;
+            // Set textures.
             this.myObject.sprite.textureKey = `${this.currentAnimation.spritesheet}_${r}_${c}`;
+            this.myObject.sprite.textureImage = LoadImage(
+                `${this.currentAnimation.spritesheet}_${r}_${c}`, 
+                this.currentAnimation.spritesheet as string, 
+                {
+                    sourceX: x, sourceY: y,
+                    width: segmentWidth, height: segmentHeight,
+                    orientation: "flipY"
+                },
+                () => {}
+            );
         }
     }
 }

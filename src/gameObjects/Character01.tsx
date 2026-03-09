@@ -42,8 +42,8 @@ export class Character01 extends Character{
             this.transform.position.z = -Math.cos(this.elapsedtime);
             this.transform.rotation.y = Math.PI;
         }
-        this.transform.rotation.x = Math.cos(this.elapsedtime);
-        this.transform.rotation.y = Math.sin(this.elapsedtime);
-        this.transform.rotation.z = Math.tan(this.elapsedtime);
+        // this.transform.rotation.x = Math.cos(this.elapsedtime);
+        // this.transform.rotation.y = Math.sin(this.elapsedtime);
+        // this.transform.rotation.z = Math.tan(this.elapsedtime);
     }
 }
