@@ -17,7 +17,7 @@ interface LoadImageParameters{
     orientation: ImageOrientation
 }
 // Load image and pass callback when image is loaded.
-export function LoadImage(key: string, src: string, parameters: LoadImageParameters, loadCallback: (image: ImageBitmap) => void): ImageBitmap | null {
+export function LoadImage(key: string, src: string, loadParameters: LoadImageParameters, loadCallback: (image: ImageBitmap) => void): ImageBitmap | null {
     if(key in imageLibrary) return imageLibrary[key];
     imageLibrary[key] = null; // Reserve this location.
     const image = new Image();
@@ -25,9 +25,9 @@ export function LoadImage(key: string, src: string, parameters: LoadImageParamet
         Promise.all([ // Create bitmap from HTML image.
             createImageBitmap(
                 image, 
-                parameters.sourceX, parameters.sourceY, 
-                parameters.width, parameters.height, 
-                { imageOrientation: parameters.orientation}
+                loadParameters.sourceX, loadParameters.sourceY, 
+                loadParameters.width, loadParameters.height, 
+                { imageOrientation: loadParameters.orientation}
             )
         ]).then((values) => {
             imageLibrary[key] = values[0];
