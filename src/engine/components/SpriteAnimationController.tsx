@@ -1,6 +1,7 @@
 import { Engine } from "../Engine";
 import type { GameObject } from "../GameObject";
-import { GetImage } from "../webgl/Images";
+import { GetImage, LoadImage } from "../webgl/Images";
+import { LoadTexture } from "../webgl/Texture";
 import type { SpriteAnimation } from "./SpriteAnimation";
 
 export class SpriteAnimationController{
@@ -23,28 +24,44 @@ export class SpriteAnimationController{
         this.Load(animation);
     }
 
-    // Load spritesheet into segements that are at most MaxTextureSize*MaxTextureSize for WebGL
-    // We will load sheets starting from the top left going to the bottom right.
+    // We will load the spritesheet into individual sprite textures.
     Load(animation: SpriteAnimation){
         if(!animation.spritesheet) return; // No spritesheet.
-        // Calc number of segements to generate.
-        var MaxSize = Engine.renderer.MaxTextureSize;
+        if(!Engine.renderer.glContext) return; // No gl context.
+        // Load whole spritesheet into memory.
         var width = animation.sheetSettings.cols * animation.sheetSettings.spriteWidth;
-        var height = animation.sheetSettings.rows * animation.sheetSettings.spriteHeight; 
-        var cols = Math.ceil(width/MaxSize);
-        var rows = Math.ceil(height/MaxSize);
-        // Generate segements.
-        for(var r=0; r < rows; r++){
-            for(var c=0; c < cols; c++){
-                var x = c*MaxSize;
-                var y = r*MaxSize;
-                var segmentWidth = MaxSize; // Max size or remainder size.
-                if(width-(c+1)*MaxSize < 0) segmentWidth = width-c*MaxSize;
-                var segmentHeight = MaxSize;
-                if(height-(r+1)*MaxSize < 0) segmentHeight = height-r*MaxSize;
-                GetImage(`${animation.spritesheet}_${r}_${c}`, animation.spritesheet, x, y, segmentWidth, segmentHeight, "flipY"); //Load images.
+        var height = animation.sheetSettings.rows * animation.sheetSettings.spriteHeight;
+        LoadImage(
+            `${animation.spritesheet}`, 
+            animation.spritesheet, 
+            {
+                sourceX: 0, sourceY: 0,
+                width: width, height: height,
+                orientation: "flipY"
+            },
+            (image: ImageBitmap) => {
+                // Load sprites in sheet as individual textures.
+                for(var i=0; i < animation.sheetSettings.spriteCount; i++){
+                    var c = (i % animation.sheetSettings.cols);
+                    var r = Math.floor(i / animation.sheetSettings.cols);
+                    var key = `${animation.spritesheet}_${r}_${c}`;
+                    if(!Engine.renderer.glContext) continue;
+                    if(LoadTexture(Engine.renderer.glContext, key, null)) continue;
+                    var x = c*animation.sheetSettings.spriteWidth;
+                    var y = r*animation.sheetSettings.spriteHeight;
+                    var segmentWidth = animation.sheetSettings.spriteWidth;
+                    var segmentHeight = animation.sheetSettings.spriteHeight;
+                    Promise.all([
+                        createImageBitmap(image, x, y, segmentWidth, segmentHeight),
+                        c,
+                        r,
+                    ]).then((values) => { 
+                        var newkey = `${animation.spritesheet}_${values[2]}_${values[1]}`;
+                        LoadTexture(Engine.renderer.glContext, newkey, values[0])
+                    });
+                }
             }
-        }
+        );
     }
 
     // Call in update loop to animate.
@@ -65,34 +82,9 @@ export class SpriteAnimationController{
             this.currentFrameIndex++;
             this.elapsedTime = 0;
             // Calculate new frame.
-            var spriteWidth = this.currentAnimation.sheetSettings.spriteWidth;
-            var spriteHeight = this.currentAnimation.sheetSettings.spriteHeight;
-            var x = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols) * spriteWidth;
-            var y = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols) * spriteHeight;
-            // Find segement based on x,y position.
-            var MaxSize = Engine.renderer.MaxTextureSize;
-            var width = this.currentAnimation.sheetSettings.cols * this.currentAnimation.sheetSettings.spriteWidth;
-            var height = this.currentAnimation.sheetSettings.rows * this.currentAnimation.sheetSettings.spriteHeight;
-            var c = Math.floor(x/MaxSize);
-            var r = Math.floor(y/MaxSize);
-            var segmentWidth = MaxSize; // Max size or remainder size.
-            if(width-(c+1)*MaxSize < 0) segmentWidth = width-c*MaxSize;
-            var segmentHeight = MaxSize;
-            if(height-(r+1)*MaxSize < 0) segmentHeight = height-r*MaxSize;
-            this.myObject.sprite.textureImage = GetImage(`${this.currentAnimation.spritesheet}_${r}_${c}`, this.currentAnimation.spritesheet as string, 0, 0, segmentWidth, segmentHeight, "flipY");
+            var c = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols);
+            var r = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols);
             this.myObject.sprite.textureKey = `${this.currentAnimation.spritesheet}_${r}_${c}`;
-            // Find texcoords position based on x,y and segment.
-            var texWidth = this.currentAnimation.sheetSettings.spriteWidth/segmentWidth;
-            var texHeight = this.currentAnimation.sheetSettings.spriteHeight/segmentHeight;
-            var texX = (x - c*MaxSize)/segmentWidth;
-            var texY = (y - r*MaxSize)/segmentHeight;
-            this.myObject.sprite.textureCoord = 
-            [
-                texX, texY,
-                texX+texWidth, texY,
-                texX+texWidth, texY+texHeight,
-                texX, texY+texHeight
-            ]
         }
     }
 }

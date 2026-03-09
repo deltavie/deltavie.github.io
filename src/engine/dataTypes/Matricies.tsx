@@ -185,4 +185,3 @@ export function mat4xmat4(a: mat4, b: mat4): mat4{
     return m4.multiply(m, m4.scaling(sx, sy, sz));
   },
 */
-}

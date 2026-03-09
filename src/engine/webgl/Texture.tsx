@@ -3,18 +3,21 @@
 var textureLibrary: {[key:string]: WebGLTexture} = {};
 var DefaultTexture:WebGLTexture | null = null;
 
-// Return webgl texture based on key, else load image into it.
-export function Texture(glContext: WebGL2RenderingContext, key: string, image: HTMLImageElement | ImageBitmap | null): WebGLTexture | null{
-    if(key in textureLibrary){
-        return textureLibrary[key];
-    }else{
-        // Try to load texture.
-        if(!image) return null;
-        const texture = loadTexture(glContext, image)
-        if(!texture) return null;
-        textureLibrary[key] = texture;
-        return texture;
-    }
+// Return texture if key exists.
+export function GetTexture(key: string): WebGLTexture | null {
+    if(key in textureLibrary) return textureLibrary[key];
+    return null;
+}
+
+// Return texture if loaded else load it.
+export function LoadTexture(glContext: WebGL2RenderingContext, key: string, image: HTMLImageElement | ImageBitmap | null): WebGLTexture | null{
+    if(key in textureLibrary) return textureLibrary[key];
+    // Try to load texture.
+    if(!image) return null; // No image to load.
+    const texture = NewTexture(glContext, image)
+    if(!texture) return null; // No texture loaded.
+    textureLibrary[key] = texture;
+    return texture;
 }
 
 // Get fallback texture.
@@ -48,7 +51,7 @@ export function GetDefaultTexture(glContext: WebGL2RenderingContext): WebGLTextu
 }
 
 // Initialize a texture and save it.
-function loadTexture(glContext: WebGL2RenderingContext, image: HTMLImageElement | ImageBitmap): WebGLTexture{
+function NewTexture(glContext: WebGL2RenderingContext, image: HTMLImageElement | ImageBitmap): WebGLTexture{
     const texture = glContext.createTexture();
     glContext.bindTexture(glContext.TEXTURE_2D, texture);
     // Create a texture with a single pixel while waiting for texture to load.

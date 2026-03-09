@@ -13,8 +13,7 @@ export class Character01 extends Character{
             cols: 31,
             spriteWidth: 256,
             spriteHeight: 256,
-            spriteCount: 31,
-            sprites:{},
+            spriteCount: 31
         },
         animation:[
         ],

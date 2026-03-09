@@ -4,34 +4,38 @@ import { Engine } from "../Engine";
 var imageLibrary: {[key:string]: ImageBitmap | null} = {};
 
 // Return image based on key.
-export function GetImage(key: string, src: string, sourceX: number, sourceY: number, width: number, height: number, orient: ImageOrientation): ImageBitmap | null;
-export function GetImage(key: string, src: ImageBitmap, sourceX: number, sourceY: number, width: number, height: number, orient: ImageOrientation): ImageBitmap | null;
-export function GetImage(key: string, src: any, sourceX: number, sourceY: number, width: number, height: number, orient: ImageOrientation): ImageBitmap | null{
-    if(key in imageLibrary){
-        return imageLibrary[key];
-    }else{
-        if(typeof src === 'string'){
-            imageLibrary[key] = null; // Reserve this location.
-            const image = new Image();
-            image.onload = () =>{
-                Promise.all([
-                    createImageBitmap(image, sourceX, sourceY, width, height, { imageOrientation: orient})
-                ]).then((values) => {
-                    imageLibrary[key] = values[0];
-                });
-            }
-            image.src = src;
-            return imageLibrary[key];
-        }else{
-            imageLibrary[key] = null; // Reserve this location.
-            Promise.all([
-                createImageBitmap(src, sourceX, sourceY, width, height)
-            ]).then((values) => {
-                imageLibrary[key] = values[0];
-            });
-            return imageLibrary[key];
-        }
+export function GetImage(key: string): ImageBitmap | null{
+    if(key in imageLibrary) return imageLibrary[key];
+    return null;
+}
+
+interface LoadImageParameters{
+    sourceX: number,
+    sourceY: number,
+    width: number,
+    height: number,
+    orientation: ImageOrientation
+}
+// Load image and pass callback when image is loaded.
+export function LoadImage(key: string, src: string, parameters: LoadImageParameters, loadCallback: (image: ImageBitmap) => void): ImageBitmap | null {
+    if(key in imageLibrary) return imageLibrary[key];
+    imageLibrary[key] = null; // Reserve this location.
+    const image = new Image();
+    image.onload = () =>{
+        Promise.all([ // Create bitmap from HTML image.
+            createImageBitmap(
+                image, 
+                parameters.sourceX, parameters.sourceY, 
+                parameters.width, parameters.height, 
+                { imageOrientation: parameters.orientation}
+            )
+        ]).then((values) => {
+            imageLibrary[key] = values[0];
+            loadCallback(values[0]);
+        });
     }
+    image.src = src;
+    return imageLibrary[key];
 }
 
 export function ResizeBitmapForTexture(key: string, imageBitmap: ImageBitmap){

@@ -37,7 +37,7 @@ export class GameObject{
             0.0,1.0
         ], // Defining texture coordinates.
         textureKey: null,
-        textureImage: null,
+        textureImage: null
     }
 
     /// Default constructor.

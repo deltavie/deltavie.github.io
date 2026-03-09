@@ -1,7 +1,7 @@
 import type { GameObject } from "../GameObject.js";
 // @ts-ignore this file SHOULD be imported fine
 import {vec3, vec4, mat4} from "./gl-matrix-min.js"
-import { GetDefaultTexture, Texture } from "./Texture.js";
+import { GetDefaultTexture, GetTexture } from "./Texture.js";
 
 //https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial
 // Vertex shader program.
@@ -194,7 +194,7 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
         const buffers = initBuffers(glContext, gameObject);
         // Load texture.
         var texture = null;
-        if(gameObject.sprite.textureKey) texture = Texture(glContext, gameObject.sprite.textureKey, null);
+        if(gameObject.sprite.textureKey) texture = GetTexture(gameObject.sprite.textureKey);
         if(!texture) texture = GetDefaultTexture(glContext); // fallback.
         // Create a new matrix for the object with the center as origin.
         const modelViewMatrix = mat4.create();
