@@ -55,21 +55,30 @@ export class SpriteAnimationController{
         if(!this.currentAnimation) return;
         this.elapsedTime += Engine.deltaTime;
         if(this.currentFrameIndex < this.currentAnimation.sheetSettings.spriteCount){ // Try to change frame.
+            // Enough time has passed & animation finished conditions.
             if(this.currentAnimation.animation.length > 0){ // Check if animation is defined else just loop through every image in sprite sheet.
                 if(this.elapsedTime < this.currentAnimation.animation[this.currentFrameIndex].duration) return; // Not enough time elapsed to change frame.
+                if(this.currentFrameIndex > this.currentAnimation.animation.length){
+                    this.currentAnimation = null;
+                    return;
+                }
             }else{
-                if(this.elapsedTime < 33) return; // Not enough time elapsed to change frame.
-            }
-            if(this.currentFrameIndex + 1 >= this.currentAnimation.sheetSettings.spriteCount){ // Next frame is out of range/animation ended.
-                this.currentAnimation = null;
-                return;
+                if(this.elapsedTime < 1/this.currentAnimation.frameRate) return; // Not enough time elapsed to change frame.
+                if(this.currentFrameIndex + 1 >= this.currentAnimation.sheetSettings.spriteCount){ // Next frame is out of range/animation ended.
+                    this.currentAnimation = null;
+                    return;
+                }
             }
             // We can change frame now.
+            var index = this.currentFrameIndex; // By default loop through every sprite.
+            if(this.currentAnimation.animation.length > 0){ // Animation object defines index to use.
+                index = this.currentAnimation.animation[this.currentFrameIndex].index;
+            }
             this.currentFrameIndex++;
             this.elapsedTime = 0;
             // Calculate new frame.
-            var c = (this.currentFrameIndex % this.currentAnimation.sheetSettings.cols);
-            var r = Math.floor(this.currentFrameIndex / this.currentAnimation.sheetSettings.cols);
+            var c = (index % this.currentAnimation.sheetSettings.cols);
+            var r = Math.floor(index / this.currentAnimation.sheetSettings.cols);
             var x = c*this.currentAnimation.sheetSettings.spriteWidth;
             var y = r*this.currentAnimation.sheetSettings.spriteHeight;
             var segmentWidth = this.currentAnimation.sheetSettings.spriteWidth;

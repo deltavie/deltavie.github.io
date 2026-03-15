@@ -3,7 +3,7 @@ import * as React from 'react';
 import {useMouse} from 'react-use';
 
 import {Engine} from './engine/Engine';
-import {defaultScene} from './scenes/defaultScene';
+import {defaultScene} from './game/defaultScene';
 
 // Engine.
 var MainEngine = Engine;

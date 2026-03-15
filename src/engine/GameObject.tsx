@@ -51,6 +51,11 @@ export class GameObject{
 
     }
 
+    // Logic when object is destoryed.
+    Destroyed(): void{
+
+    }
+
     // Logic update function.
     Update(): void{
         return;

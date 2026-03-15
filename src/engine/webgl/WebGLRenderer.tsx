@@ -27,10 +27,9 @@ const fsSource = `
 
     void main(void) {
       gl_FragColor = texture2D(uSampler, vTextureCoord);
-      if(gl_FragColor == vec4(0.000, 0.000, 0.000, 0.000)) discard;
+      if(gl_FragColor.w <= 0.5) discard;
     }
   `;
-// if(gl_FragColor == vec4(0.000, 0.000, 0.000, 0.000)) discard;
 // texture transparency hack, can't have semi-transparent but can have fully transparent
 // need to find a solution for semi transparency
 
@@ -162,7 +161,7 @@ function loadShader(glContext: WebGL2RenderingContext, type: number, source: str
     return shader;
 }
 //
-// Main render loop!
+// Actually render the scene.
 //
 function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo, gameObjects: GameObject[], camera: GameObject) {
     glContext.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
@@ -188,6 +187,7 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
     // note: glMatrix always has the first argument
     // as the destination to receive the result.
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    //mat4.ortho(projectionMatrix, -1*aspect, 1*aspect, -1, 1, 1, 100);
     // Objects we'll be drawing.
     for(var i=0; i < gameObjects.length; i ++){
         var gameObject = gameObjects[i];
@@ -208,6 +208,15 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
                 gameObject.transform.position.z - camera.transform.position.z,
             ],
         ); // amount to translate.
+        // mat4.scale(
+        //     modelViewMatrix, // destination matrix
+        //     modelViewMatrix, // matrix to translate
+        //     [
+        //         2,
+        //         2,
+        //         2
+        //     ],
+        // ); // Scaling
         // Apply rotations on the object about x/y/z axis.
         mat4.rotate(
             modelViewMatrix,

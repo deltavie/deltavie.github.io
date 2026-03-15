@@ -16,5 +16,6 @@ interface Frame{
 export interface SpriteAnimation {
     spritesheet: string | null;
     sheetSettings: SpriteSheetSettings;
+    frameRate: number;
     animation: Frame[];
 }

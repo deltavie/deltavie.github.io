@@ -9,7 +9,7 @@ var MainCamera: Camera = new Camera();
 // Main export class.
 export class EngineObj {
     // Engine parameters.
-    deltaTime: number;
+    deltaTime: number; // In seconds.
     private lastTimestamp: number = 0;;
     pause: boolean;
     engineTimerId: number;
@@ -41,7 +41,7 @@ export class EngineObj {
 
     // Run the engine.
     Clock(mouse: ReturnType<typeof useMouse>, timestamp: DOMHighResTimeStamp){
-        this.deltaTime = timestamp - this.lastTimestamp;
+        this.deltaTime = (timestamp - this.lastTimestamp)/1000;
         this.lastTimestamp = timestamp;
         this.mouse = mouse;
         this.Logic();
@@ -68,6 +68,7 @@ export class EngineObj {
             for(var i=0; i<this.objectsToDelete.length;i++){
                 const index = this.gameObjects.findIndex((element) => element == this.objectsToDelete[i]);
                 if (index > -1) {
+                    this.objectsToDelete[i].Destroyed();
                     this.gameObjects.splice(index, 1);
                 }
             }
