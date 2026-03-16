@@ -5,7 +5,10 @@ var imageLibrary: {[key:string]: ImageBitmap | null} = {};
 
 // Return image based on key.
 export function GetImage(key: string): ImageBitmap | null{
-    if(key in imageLibrary) return imageLibrary[key];
+    if(key in imageLibrary) { // Return key if exists else delete null keys.
+        if(imageLibrary[key]) return imageLibrary[key];
+        delete imageLibrary[key];
+    }
     return null;
 }
 
@@ -18,7 +21,10 @@ interface LoadImageParameters{
 }
 // Load image and pass callback when image is loaded.
 export function LoadImage(key: string, src: string, loadParameters: LoadImageParameters, loadCallback: (image: ImageBitmap) => void): ImageBitmap | null {
-    if(key in imageLibrary) return imageLibrary[key];
+    if(key in imageLibrary) { // Return key if exists else delete null keys.
+        if(imageLibrary[key]) return imageLibrary[key];
+        delete imageLibrary[key];
+    }
     imageLibrary[key] = null; // Reserve this location.
     const image = new Image();
     image.onload = () =>{

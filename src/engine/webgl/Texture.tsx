@@ -5,13 +5,19 @@ var DefaultTexture:WebGLTexture | null = null;
 
 // Return texture if key exists.
 export function GetTexture(key: string): WebGLTexture | null {
-    if(key in textureLibrary) return textureLibrary[key];
+    if(key in textureLibrary) { // Return key if exists else delete null keys.
+        if(textureLibrary[key]) return textureLibrary[key];
+        delete textureLibrary[key];
+    }
     return null;
 }
 
 // Return texture if loaded else load it.
 export function LoadTexture(glContext: WebGL2RenderingContext, key: string, image: HTMLImageElement | ImageBitmap | null): WebGLTexture | null{
-    if(key in textureLibrary) return textureLibrary[key];
+    if(key in textureLibrary) { // Return key if exists else delete null keys.
+        if(textureLibrary[key]) return textureLibrary[key];
+        delete textureLibrary[key];
+    }
     // Try to load texture.
     if(!image) return null; // No image to load.
     const texture = NewTexture(glContext, image)
