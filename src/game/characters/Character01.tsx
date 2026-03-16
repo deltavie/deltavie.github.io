@@ -62,6 +62,9 @@ export class Character01 extends Character{
     // Run state machine.
     Update(){
         super.Update();
+        // this.transform.position.x = Engine.invMousePos[0];
+        // this.transform.position.y = Engine.invMousePos[1];
+        // this.transform.position.z = Engine.invMousePos[2];
         this.StateController();
     };
     // Character state machine.

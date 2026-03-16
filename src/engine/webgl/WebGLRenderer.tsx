@@ -1,3 +1,4 @@
+import type { Camera } from "../Camera.js";
 import type { Vec3, Vec4 } from "../dataTypes/Vectors.js";
 import type { GameObject } from "../GameObject.js";
 // @ts-ignore this file SHOULD be imported fine
@@ -12,11 +13,12 @@ const vsSource = `
 
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
+    uniform mat4 uViewMatrix;
 
     varying highp vec2 vTextureCoord;
 
     void main(void) {
-      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
       vTextureCoord = aTextureCoord;
     }
   `;
@@ -45,6 +47,7 @@ interface glProgramInfo{
     };
     uniformLocations: {
         projectionMatrix: any;
+        viewMatrix: any;
         modelViewMatrix: any;
         uSampler: any;
     };
@@ -62,6 +65,7 @@ export class webglRenderer{
         },
         uniformLocations: {
             projectionMatrix: null,
+            viewMatrix: null,
             modelViewMatrix: null,
             uSampler: null
         }
@@ -74,8 +78,9 @@ export class webglRenderer{
         z: 0,
         w: 0,
     }
-    // Perspective matrix.
+    // Projection matricies.
     projectionMatrix = mat4.create();
+    viewMatrix = mat4.create();
     // Set projection matrix mode.
     SetPerspective(projection: "PERSPECTIVE" | "ORTHOGRAPHIC", fieldOfView: number, aspect: number, zNear: number, zFar: number){
         if(projection == "PERSPECTIVE"){
@@ -108,6 +113,7 @@ export class webglRenderer{
         };
         this.programInfo.uniformLocations = {
             projectionMatrix: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uProjectionMatrix"),
+            viewMatrix: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uViewMatrix"),
             modelViewMatrix: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uModelViewMatrix"),
             uSampler: this.glContext.getUniformLocation(this.programInfo.shaderProgram as WebGLProgram, "uSampler"),
         };
@@ -128,7 +134,7 @@ export class webglRenderer{
         this.SetPerspective("PERSPECTIVE", fieldOfView, aspect, zNear, zFar);
     }
     // Render loop.
-    Render(gameObjects: GameObject[], camera: GameObject){
+    Render(gameObjects: GameObject[], camera: Camera){
         if(gameObjects.length <= 0) return;
         // Draw the scene
         drawScene(this, gameObjects, camera);
@@ -191,13 +197,14 @@ function loadShader(glContext: WebGL2RenderingContext, type: number, source: str
 //
 // Actually render the scene.
 //
-function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: GameObject) {
+function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: Camera) {
     if(!renderer.glContext) return;
     // Variables.
     var glContext = renderer.glContext;
     var programInfo = renderer.programInfo;
     var background = renderer.CanvasClearColor;
     var projectionMatrix = renderer.projectionMatrix;
+    // GL settings.
     glContext.clearColor(background.x, background.y, background.z, background.w);
     glContext.clearDepth(1.0); // Clear everything
     glContext.enable(glContext.DEPTH_TEST); // Enable depth testing
@@ -208,6 +215,14 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: G
     glContext.pixelStorei(glContext.UNPACK_FLIP_Y_WEBGL, true);
     // Clear the canvas before we start drawing on it.
     glContext.clear(glContext.COLOR_BUFFER_BIT | glContext.DEPTH_BUFFER_BIT);
+    // Make a view matrix to transform world space to screen space.
+    var viewEye = vec3.create();
+    viewEye = [camera.transform.position.x, camera.transform.position.y, camera.transform.position.z];
+    var lookAt = vec3.create();
+    lookAt = [camera.LookAt.x, camera.LookAt.y, camera.LookAt.z];
+    var viewUp = vec3.create();
+    viewUp = [camera.Up.x, camera.Up.y, camera.Up.z];
+    mat4.lookAt(renderer.viewMatrix, viewEye, lookAt, viewUp);
     // Objects we'll be drawing.
     for(var i=0; i < gameObjects.length; i ++){
         var gameObject = gameObjects[i];
@@ -218,7 +233,7 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: G
         if(!texture) texture = GetDefaultTexture(glContext); // fallback.
         // Create a new matrix for the object with the center as origin.
         const modelViewMatrix = mat4.create();
-        // Move the object relative to the camera position.
+        // Calculate world space cords.
         mat4.translate(
             modelViewMatrix, // destination matrix
             modelViewMatrix, // matrix to translate
@@ -270,6 +285,11 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: G
             programInfo.uniformLocations.projectionMatrix,
             false,
             projectionMatrix,
+        );
+        glContext.uniformMatrix4fv(
+            programInfo.uniformLocations.viewMatrix,
+            false,
+            renderer.viewMatrix,
         );
         glContext.uniformMatrix4fv(
             programInfo.uniformLocations.modelViewMatrix,
