@@ -1,3 +1,4 @@
+import type { Vec3, Vec4 } from "../dataTypes/Vectors.js";
 import type { GameObject } from "../GameObject.js";
 // @ts-ignore this file SHOULD be imported fine
 import {vec3, vec4, mat4} from "./gl-matrix-min.js"
@@ -48,6 +49,7 @@ interface glProgramInfo{
         uSampler: any;
     };
 }
+
 // Main program.
 export class webglRenderer{
     // GL parameters.
@@ -64,7 +66,24 @@ export class webglRenderer{
             uSampler: null
         }
     }
+    // Rendering parameters.
     MaxTextureSize: number = 4096; // When loading textures we cannot exceed this size.
+    CanvasClearColor: Vec4 = { // What color the canvas defaults to.
+        x: 0,
+        y: 0,
+        z: 0,
+        w: 0,
+    }
+    // Perspective matrix.
+    projectionMatrix = mat4.create();
+    // Set projection matrix mode.
+    SetPerspective(projection: "PERSPECTIVE" | "ORTHOGRAPHIC", fieldOfView: number, aspect: number, zNear: number, zFar: number){
+        if(projection == "PERSPECTIVE"){
+            mat4.perspective(this.projectionMatrix, fieldOfView, aspect, zNear, zFar);
+        }else{
+            mat4.ortho(this.projectionMatrix, -1*aspect, 1*aspect, -1, 1, zNear, zFar);
+        }
+    }
     // Initial webgl instance.
     Initialize(canvas: HTMLCanvasElement){
         // Initialize the GL context
@@ -77,7 +96,7 @@ export class webglRenderer{
             return;
         }
         // Set clear color to black, fully opaque
-        this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.glContext.clearColor(this.CanvasClearColor.x, this.CanvasClearColor.y, this.CanvasClearColor.z, this.CanvasClearColor.w);
         // Clear the color buffer with specified clear color
         this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
         // Initialize a shader program; this is where all the lighting
@@ -97,13 +116,22 @@ export class webglRenderer{
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
         // Get parameters.
         this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE)/8;
+        // Create a perspective matrix.
+        // Our field of view is 45 degrees, with a width/height
+        // ratio that matches the display size of the canvas
+        // and we only want to see objects between 0.1 units
+        // and 100 units away from the camera.
+        var fieldOfView = (45 * Math.PI) / 180; // in radians
+        var aspect = this.glContext.canvas.width / this.glContext.canvas.height;
+        var zNear = 0.1;
+        var zFar = 100.0;
+        this.SetPerspective("PERSPECTIVE", fieldOfView, aspect, zNear, zFar);
     }
     // Render loop.
     Render(gameObjects: GameObject[], camera: GameObject){
-        if(!this.glContext) return;
         if(gameObjects.length <= 0) return;
         // Draw the scene
-        drawScene(this.glContext, this.programInfo, gameObjects, camera);
+        drawScene(this, gameObjects, camera);
     }
 }
 //
@@ -163,8 +191,14 @@ function loadShader(glContext: WebGL2RenderingContext, type: number, source: str
 //
 // Actually render the scene.
 //
-function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo, gameObjects: GameObject[], camera: GameObject) {
-    glContext.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: GameObject) {
+    if(!renderer.glContext) return;
+    // Variables.
+    var glContext = renderer.glContext;
+    var programInfo = renderer.programInfo;
+    var background = renderer.CanvasClearColor;
+    var projectionMatrix = renderer.projectionMatrix;
+    glContext.clearColor(background.x, background.y, background.z, background.w);
     glContext.clearDepth(1.0); // Clear everything
     glContext.enable(glContext.DEPTH_TEST); // Enable depth testing
     glContext.depthFunc(glContext.LEQUAL); // Near things obscure far things
@@ -174,20 +208,6 @@ function drawScene(glContext: WebGL2RenderingContext, programInfo: glProgramInfo
     glContext.pixelStorei(glContext.UNPACK_FLIP_Y_WEBGL, true);
     // Clear the canvas before we start drawing on it.
     glContext.clear(glContext.COLOR_BUFFER_BIT | glContext.DEPTH_BUFFER_BIT);
-    // Create a perspective matrix.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
-    const fieldOfView = (45 * Math.PI) / 180; // in radians
-    const aspect = glContext.canvas.width / glContext.canvas.height;
-    const zNear = 0.1;
-    const zFar = 100.0;
-    const projectionMatrix = mat4.create();
-    // note: glMatrix always has the first argument
-    // as the destination to receive the result.
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-    //mat4.ortho(projectionMatrix, -1*aspect, 1*aspect, -1, 1, 1, 100);
     // Objects we'll be drawing.
     for(var i=0; i < gameObjects.length; i ++){
         var gameObject = gameObjects[i];

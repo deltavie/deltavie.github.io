@@ -14,14 +14,20 @@ export class SpriteAnimationController{
         this.myObject = object;
     }
 
-    // Play animation.
-    Play(animation: SpriteAnimation){
+    Play(animation: SpriteAnimation, override: boolean = false){ // Play animation.
+        if(this.currentAnimation && override == false){ // If not overriding check if current animation priority >= new animation priority.
+            if(animation.animationPriority <= this.currentAnimation.animationPriority) return;
+        }
         // Set current animation and reset counters.
         this.currentAnimation = animation;
         this.elapsedTime = 0;
         this.currentFrameIndex = 0;
         // Load animation.
         this.Load(animation);
+    }
+
+    Stop(){ // Stop animation.
+        this.currentAnimation = null;
     }
 
     // We will load the spritesheet into individual sprite textures.

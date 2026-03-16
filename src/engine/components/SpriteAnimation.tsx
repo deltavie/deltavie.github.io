@@ -18,4 +18,5 @@ export interface SpriteAnimation {
     sheetSettings: SpriteSheetSettings;
     frameRate: number;
     animation: Frame[];
+    animationPriority: number;
 }

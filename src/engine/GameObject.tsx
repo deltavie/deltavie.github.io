@@ -4,6 +4,7 @@ import type { Vec4 } from "./dataTypes/Vectors";
 interface Transform {
     position: Vec4;
     rotation: Vec4;
+    scale: Vec4;
 }
 
 export class GameObject{
@@ -13,7 +14,8 @@ export class GameObject{
     // Transfrom.
     transform: Transform = {
         position: {x:0, y:0, z:0, w:0},
-        rotation: {x:0, y:0, z:0, w:0}
+        rotation: {x:0, y:0, z:0, w:0},
+        scale: {x:1, y:1, z:1, w:1},
     }
     // Sprite.
     sprite: Sprite = {

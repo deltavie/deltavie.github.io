@@ -1,7 +1,7 @@
-import { SpriteAnimation } from "../../engine/components/SpriteAnimation";
-import { Vec3 } from "../../engine/dataTypes/Vectors";
+import type { SpriteAnimation } from "../../engine/components/SpriteAnimation";
+import type { Vec3 } from "../../engine/dataTypes/Vectors";
 import { Engine } from "../../engine/Engine";
-import { Action } from "../actions/action";
+import { Action } from "./Action";
 import { Character } from "../characters/Character";
 
 export class ActionMove extends Action{
@@ -39,7 +39,12 @@ export class ActionMove extends Action{
         // Move to target else end action.
         if(distToTarget > this.walkSpeed){
             this.ActionPerformer.transform.position.x += dirVecNormalized.x * this.walkSpeed * Engine.deltaTime;
-            if(this.walkAnimation) this.ActionPerformer.AnimController.Play(this.walkAnimation);
+            this.ActionPerformer.transform.position.y += dirVecNormalized.y * this.walkSpeed * Engine.deltaTime;
+            this.ActionPerformer.transform.position.z += dirVecNormalized.z * this.walkSpeed * Engine.deltaTime;
+            this.ActionPerformer.AnimController.Play(this.walkAnimation);
+        }else{
+            this.ActionPerformer.CurrentAction = null;
+            this.ActionPerformer.AnimController.Stop();
         }
     };
 }
