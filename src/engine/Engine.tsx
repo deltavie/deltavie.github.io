@@ -17,6 +17,7 @@ export class EngineObj {
     mouse: ReturnType<typeof useMouse> | null = null;
 
     // Renderer.
+    canvas: HTMLCanvasElement | null = null; // Saved for lazy canvas reloading.
     renderer: webglRenderer = new webglRenderer();
 
     // Objects.
@@ -32,12 +33,13 @@ export class EngineObj {
         this.gameObjects = [];
         this.objectsToInstantiate = [];
         this.objectsToDelete = [];
-        MainCamera.transform.position = {x:0,y:0,z:2,w:0};
+        MainCamera.transform.position = {x:0,y:0,z:5,w:0};
         MainCamera.LookAt = {x:0,y:0,z:0};
     }
 
     // Initialize the engine.
     Initialize(canvas: HTMLCanvasElement){
+        this.canvas = canvas;
         this.renderer.Initialize(canvas);
     }
 
@@ -51,20 +53,20 @@ export class EngineObj {
         this.Render();
         // Mouse position test. this works, inv(pespective*view*modelview)*point
         // if(!this.renderer.glContext) return;
-        // const modelViewMatrix = mat4.create();
-        // mat4.translate(
-        //     modelViewMatrix, // destination matrix
-        //     modelViewMatrix, // matrix to translate
-        //     [
-        //         -MainCamera.transform.position.x,
-        //         -MainCamera.transform.position.y,
-        //         -MainCamera.transform.position.z,
-        //     ],
-        // );
-        // var combinedMat1 = mat4.create();
-        // mat4.multiply(combinedMat1, this.renderer.viewMatrix, modelViewMatrix);
+        // // const modelViewMatrix = mat4.create(); // No need to modelview matrix if objects are not translate relative to camera.
+        // // mat4.translate(
+        // //     modelViewMatrix, // destination matrix
+        // //     modelViewMatrix, // matrix to translate
+        // //     [
+        // //         -MainCamera.transform.position.x,
+        // //         -MainCamera.transform.position.y,
+        // //         -MainCamera.transform.position.z,
+        // //     ],
+        // // );
+        // // var combinedMat1 = mat4.create();
+        // // mat4.multiply(combinedMat1, this.renderer.viewMatrix, modelViewMatrix);
         // var combinedMat2 = mat4.create();
-        // mat4.multiply(combinedMat2, this.renderer.projectionMatrix, combinedMat1);
+        // mat4.multiply(combinedMat2, this.renderer.projectionMatrix, this.renderer.viewMatrix);
         // var invMat = mat4.create();
         // mat4.invert(invMat, combinedMat2);
         // var mousePos = vec4.create();
@@ -109,6 +111,7 @@ export class EngineObj {
 
     // Render update.
     private Render(){
+        if(!this.renderer.glContext && this.canvas) this.renderer.Initialize(this.canvas); // Lazy way to reload canvas when context is lost.
         this.renderer.Render(this.gameObjects, MainCamera);
     }
 

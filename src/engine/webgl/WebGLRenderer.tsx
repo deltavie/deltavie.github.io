@@ -238,9 +238,9 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: C
             modelViewMatrix, // destination matrix
             modelViewMatrix, // matrix to translate
             [
-                gameObject.transform.position.x - camera.transform.position.x,
-                gameObject.transform.position.y - camera.transform.position.y,
-                gameObject.transform.position.z - camera.transform.position.z,
+                gameObject.transform.position.x, //- camera.transform.position.x, // No longer need to translate by camera since we now have a view matrix.
+                gameObject.transform.position.y, //- camera.transform.position.y,
+                gameObject.transform.position.z, //- camera.transform.position.z,
             ],
         ); // amount to translate.
         // mat4.scale(
