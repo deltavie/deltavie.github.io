@@ -1,7 +1,7 @@
-// Import images.
+// Import files dynamically.
 function importAll(r: Rspack.Context) {
-    let images = {};
-    r.keys().map(item => { images[item.replace('./', '')] = r(item); });
-    return images;
+    let files = {};
+    r.keys().map(item => { files[item.replace('./', '')] = r(item); });
+    return files;
 }
 export const images: {[key:string]: string} = importAll(require.context('../images', false, '/\.png/'));
