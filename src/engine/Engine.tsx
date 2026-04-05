@@ -67,33 +67,33 @@ export class EngineObj {
         this.Logic();
         this.Render();
         // Mouse position test. this works, inv(pespective*view*modelview)*point
-        if(!this.renderer.glContext) return;
-        // const modelViewMatrix = mat4.create(); // No need to modelview matrix if objects are not translate relative to camera.
-        // mat4.translate(
-        //     modelViewMatrix, // destination matrix
-        //     modelViewMatrix, // matrix to translate
-        //     [
-        //         -MainCamera.transform.position.x,
-        //         -MainCamera.transform.position.y,
-        //         -MainCamera.transform.position.z,
-        //     ],
-        // );
-        // var combinedMat1 = mat4.create();
-        // mat4.multiply(combinedMat1, this.renderer.viewMatrix, modelViewMatrix);
-        var combinedMat2 = mat4.create();
-        mat4.multiply(combinedMat2, this.renderer.projectionMatrix, this.renderer.viewMatrix);
-        var invMat = mat4.create();
-        mat4.invert(invMat, combinedMat2);
-        var mousePos = vec4.create();
-        mousePos[0] = 2*(this.mouse.elX/this.mouse.elW)-1;
-        mousePos[1] = 1-2*(this.mouse.elY/this.mouse.elH);
-        mousePos[2] = 0.98;
-        mousePos[3] = 1;
-        vec4.transformMat4(this.invMousePos, mousePos, invMat);
-        var wInv = 1/this.invMousePos[3];
-        this.invMousePos[0] = this.invMousePos[0]*wInv; // Divide by w after multiplication.
-        this.invMousePos[1] = this.invMousePos[1]*wInv;
-        this.invMousePos[2] = this.invMousePos[2]*wInv;
+        // if(!this.renderer.glContext) return;
+        // // const modelViewMatrix = mat4.create(); // No need to modelview matrix if objects are not translate relative to camera.
+        // // mat4.translate(
+        // //     modelViewMatrix, // destination matrix
+        // //     modelViewMatrix, // matrix to translate
+        // //     [
+        // //         -MainCamera.transform.position.x,
+        // //         -MainCamera.transform.position.y,
+        // //         -MainCamera.transform.position.z,
+        // //     ],
+        // // );
+        // // var combinedMat1 = mat4.create();
+        // // mat4.multiply(combinedMat1, this.renderer.viewMatrix, modelViewMatrix);
+        // var combinedMat2 = mat4.create();
+        // mat4.multiply(combinedMat2, this.renderer.projectionMatrix, this.renderer.viewMatrix);
+        // var invMat = mat4.create();
+        // mat4.invert(invMat, combinedMat2);
+        // var mousePos = vec4.create();
+        // mousePos[0] = 2*(this.mouse.elX/this.mouse.elW)-1;
+        // mousePos[1] = 1-2*(this.mouse.elY/this.mouse.elH);
+        // mousePos[2] = 0.98;
+        // mousePos[3] = 1;
+        // vec4.transformMat4(this.invMousePos, mousePos, invMat);
+        // var wInv = 1/this.invMousePos[3];
+        // this.invMousePos[0] = this.invMousePos[0]*wInv; // Divide by w after multiplication.
+        // this.invMousePos[1] = this.invMousePos[1]*wInv;
+        // this.invMousePos[2] = this.invMousePos[2]*wInv;
     }
 
     // Logic update.
