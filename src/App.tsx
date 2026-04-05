@@ -1,7 +1,5 @@
 import './App.css';
 import * as React from 'react';
-import {useMouse} from 'react-use';
-
 import {Engine} from './engine/Engine';
 import {defaultScene} from './game/defaultScene';
 
@@ -13,27 +11,39 @@ var mainScene: defaultScene = new defaultScene();
 
 // References.
 var canvasRef: React.RefObject<HTMLCanvasElement>;
-var mouse: ReturnType<typeof useMouse>;
 
 const App = () => {
   // References.
   canvasRef = React.useRef<HTMLCanvasElement>(null) as React.RefObject<HTMLCanvasElement>;
-  mouse = useMouse(canvasRef);
 
   // Startup engine.
   React.useEffect(() => {
     // Init engine.
     MainEngine.Initialize(canvasRef.current);
+    // Set up event listeners.
+    canvasRef.current.addEventListener("mousemove", (event) => {
+      var canvas = canvasRef.current;
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width;
+      var scaleY = canvas.height / rect.height;
+      MainEngine.UpdateMouse({
+        elX: (event.clientX - rect.left) * scaleX,
+        elY: (event.clientY - rect.top) * scaleY,
+        elW: rect.width,
+        elH: rect.height
+      })
+    })
     // Load scene.
     mainScene.Load();
   }, [])
+
 
   // Engine loop.
   React.useEffect(() => {
     if(MainEngine.pause){
       // Engine loop.
       const nextFrame = (timestamp: DOMHighResTimeStamp) => {
-        MainEngine.Clock(mouse, timestamp);
+        MainEngine.Clock(timestamp);
         MainEngine.engineTimerId = requestAnimationFrame(nextFrame);
       }
       // Call first engine loop.
