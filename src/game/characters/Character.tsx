@@ -17,7 +17,7 @@ export class Character extends GameObject{
     // Make character face a vector.
     Face(direction: Vec3): void {
         if(direction.x >= this.transform.position.x){
-            this.transform.rotation.y = 180;
+            this.transform.rotation.y = Math.PI;
         }else{
             this.transform.rotation.y = 0;
         }

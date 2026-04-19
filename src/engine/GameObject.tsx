@@ -19,9 +19,9 @@ export class GameObject{
     }
     // Sprite.
     sprite: Sprite = {
-        position: {x:0, y:0, z:0, w:0},
-        scale: {x:0, y:0, z:0, w:0},
-        rotation: {x:0, y:0, z:0, w:0},
+        position: {x:0, y:0, z:0, w:0}, // Meters.
+        scale: {x:0, y:0, z:0, w:0}, // Meters.
+        rotation: {x:0, y:0, z:0, w:0}, // Radians.
         flipped: false,
         verticies: [
             -1.0, -1.0, 0,
