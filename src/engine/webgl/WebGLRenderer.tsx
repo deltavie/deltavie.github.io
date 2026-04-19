@@ -1,40 +1,17 @@
 import type { Camera } from "../Camera.js";
 import type { Vec3, Vec4 } from "../dataTypes/Vectors.js";
 import type { GameObject } from "../GameObject.js";
+import { defaultFS } from "./fragment-shaders/defaultFS.js";
 // @ts-ignore this file SHOULD be imported fine
 import {vec3, vec4, mat4} from "./gl-matrix-min.js"
 import { GetDefaultTexture, GetTexture, LoadTexture } from "./Texture.js";
+import { defaultVS } from "./vertex-shaders/defaultVS.js";
 
 //https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial
 // Vertex shader program.
-const vsSource = `
-    attribute vec4 aVertexPosition;
-    attribute vec2 aTextureCoord;
-
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-    uniform mat4 uViewMatrix;
-
-    varying highp vec2 vTextureCoord;
-
-    void main(void) {
-      gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
-      vTextureCoord = aTextureCoord;
-    }
-  `;
+const vsSource = defaultVS;
 // Fragment shader program.
-const fsSource = `
-    varying highp vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-
-    void main(void) {
-      gl_FragColor = texture2D(uSampler, vTextureCoord);
-      if(gl_FragColor.w <= 0.5) discard;
-    }
-  `;
-// texture transparency hack, can't have semi-transparent but can have fully transparent
-// need to find a solution for semi transparency
+const fsSource = defaultFS;
 
 // Collect all the info needed to use the shader program.
 // Look up which attribute our shader program is using

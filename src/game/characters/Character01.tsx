@@ -43,21 +43,7 @@ export class Character01 extends Character{
     };
     // Change direction this character is facing.
     Face(direction: Vec3): void {
-        if(direction.x >= this.transform.position.x){
-            this.sprite.textureCoord = [
-                1.0,0.0,
-                0.0,0.0,
-                0.0,1.0,
-                1.0,1.0
-            ]
-        }else{
-            this.sprite.textureCoord = [
-                0.0,0.0,
-                1.0,0.0,
-                1.0,1.0,
-                0.0,1.0
-            ]
-        }
+        super.Face(direction);
     };
     // Run state machine.
     Update(){

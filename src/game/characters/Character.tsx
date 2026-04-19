@@ -17,19 +17,9 @@ export class Character extends GameObject{
     // Make character face a vector.
     Face(direction: Vec3): void {
         if(direction.x >= this.transform.position.x){
-            this.sprite.textureCoord = [
-                1.0,0.0,
-                0.0,0.0,
-                0.0,1.0,
-                1.0,1.0
-            ]
+            this.transform.rotation.y = 180;
         }else{
-            this.sprite.textureCoord = [
-                0.0,0.0,
-                1.0,0.0,
-                1.0,1.0,
-                0.0,1.0
-            ]
+            this.transform.rotation.y = 0;
         }
     };
 
