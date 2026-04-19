@@ -3,7 +3,7 @@ import type { Vec3, Vec4 } from "../dataTypes/Vectors.js";
 import type { GameObject } from "../GameObject.js";
 import { defaultFS } from "./fragment-shaders/defaultFS.js";
 // @ts-ignore this file SHOULD be imported fine
-import {vec3, vec4, mat4} from "./gl-matrix-min.js"
+import { vec3, vec4, mat4 } from "./gl-matrix-min.js"
 import { GetDefaultTexture, GetTexture, LoadTexture } from "./Texture.js";
 import { defaultVS } from "./vertex-shaders/defaultVS.js";
 
@@ -16,7 +16,7 @@ const fsSource = defaultFS;
 // Collect all the info needed to use the shader program.
 // Look up which attribute our shader program is using
 // for aVertexPosition and look up uniform locations.
-interface glProgramInfo{
+interface glProgramInfo {
     shaderProgram: WebGLProgram | null;
     attribLocations: {
         vertexPosition: any;
@@ -31,7 +31,7 @@ interface glProgramInfo{
 }
 
 // Main program.
-export class webglRenderer{
+export class webglRenderer {
     // GL parameters.
     glContext: WebGL2RenderingContext | null = null;
     programInfo: glProgramInfo = {
@@ -59,21 +59,21 @@ export class webglRenderer{
     projectionMatrix = mat4.create();
     viewMatrix = mat4.create();
     // Set projection matrix mode.
-    SetPerspective(projection: "PERSPECTIVE" | "ORTHOGRAPHIC", fieldOfView: number, aspect: number, zNear: number, zFar: number){
-        if(projection == "PERSPECTIVE"){
+    SetPerspective(projection: "PERSPECTIVE" | "ORTHOGRAPHIC", fieldOfView: number, aspect: number, zNear: number, zFar: number) {
+        if (projection == "PERSPECTIVE") {
             mat4.perspective(this.projectionMatrix, fieldOfView, aspect, zNear, zFar);
-        }else{
-            mat4.ortho(this.projectionMatrix, -1*aspect, 1*aspect, -1, 1, zNear, zFar);
+        } else {
+            mat4.ortho(this.projectionMatrix, -1 * aspect, 1 * aspect, -1, 1, zNear, zFar);
         }
     }
     // Initial webgl instance.
-    Initialize(canvas: HTMLCanvasElement){
+    Initialize(canvas: HTMLCanvasElement) {
         // Initialize the GL context
         this.glContext = canvas.getContext("webgl2");
-         // Only continue if WebGL is available and working
+        // Only continue if WebGL is available and working
         if (this.glContext === null) {
             alert(
-            "Unable to initialize WebGL. Your browser or machine may not support it.",
+                "Unable to initialize WebGL. Your browser or machine may not support it.",
             );
             return;
         }
@@ -98,7 +98,7 @@ export class webglRenderer{
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
         this.glContext.enableVertexAttribArray(this.programInfo.attribLocations.vertexPosition);
         // Get parameters.
-        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE)/8;
+        this.MaxTextureSize = this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE) / 8;
         // Create a perspective matrix.
         // Our field of view is 45 degrees, with a width/height
         // ratio that matches the display size of the canvas
@@ -111,8 +111,8 @@ export class webglRenderer{
         this.SetPerspective("PERSPECTIVE", fieldOfView, aspect, zNear, zFar);
     }
     // Render loop.
-    Render(gameObjects: GameObject[], camera: Camera){
-        if(gameObjects.length <= 0) return;
+    Render(gameObjects: GameObject[], camera: Camera) {
+        if (gameObjects.length <= 0) return;
         // Draw the scene
         drawScene(this, gameObjects, camera);
     }
@@ -175,7 +175,7 @@ function loadShader(glContext: WebGL2RenderingContext, type: number, source: str
 // Actually render the scene.
 //
 function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: Camera) {
-    if(!renderer.glContext) return;
+    if (!renderer.glContext) return;
     // Variables.
     var glContext = renderer.glContext;
     var programInfo = renderer.programInfo;
@@ -200,14 +200,27 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: C
     var viewUp = vec3.create();
     viewUp = [camera.Up.x, camera.Up.y, camera.Up.z];
     mat4.lookAt(renderer.viewMatrix, viewEye, lookAt, viewUp);
-    // Objects we'll be drawing.
-    for(var i=0; i < gameObjects.length; i ++){
+    // Tell WebGL to use our program when drawing
+    glContext.useProgram(programInfo.shaderProgram);
+    // Bind uniforms for view and projection matrix.
+    glContext.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix,
+    );
+    glContext.uniformMatrix4fv(
+        programInfo.uniformLocations.viewMatrix,
+        false,
+        renderer.viewMatrix,
+    );
+    // Objects we'll be drawing. // Geometry pass.
+    for (var i = 0; i < gameObjects.length; i++) {
         var gameObject = gameObjects[i];
         const buffers = initBuffers(glContext, gameObject);
         // Load texture.
         var texture = null;
-        if(gameObject.sprite.textureKey) texture = LoadTexture(glContext, gameObject.sprite.textureKey, gameObject.sprite.textureImage);
-        if(!texture) texture = GetDefaultTexture(glContext); // fallback.
+        if (gameObject.sprite.textureKey) texture = LoadTexture(glContext, gameObject.sprite.textureKey, gameObject.sprite.textureImage);
+        if (!texture) texture = GetDefaultTexture(glContext); // fallback.
         // Create a new matrix for the object with the center as origin.
         const modelViewMatrix = mat4.create();
         // Calculate world space cords.
@@ -255,19 +268,7 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: C
         setTextureAttribute(glContext, buffers, programInfo);
         // Tell WebGL which indices to use to index the vertices
         glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, buffers.indices);
-        // Tell WebGL to use our program when drawing
-        glContext.useProgram(programInfo.shaderProgram);
         // Set the shader uniforms
-        glContext.uniformMatrix4fv(
-            programInfo.uniformLocations.projectionMatrix,
-            false,
-            projectionMatrix,
-        );
-        glContext.uniformMatrix4fv(
-            programInfo.uniformLocations.viewMatrix,
-            false,
-            renderer.viewMatrix,
-        );
         glContext.uniformMatrix4fv(
             programInfo.uniformLocations.modelViewMatrix,
             false,
@@ -287,6 +288,7 @@ function drawScene(renderer: webglRenderer, gameObjects: GameObject[], camera: C
             glContext.drawElements(glContext.TRIANGLES, vertexCount, type, offset);
         }
     }
+    // Lighting pass.
 }
 //
 // Make buffers for object.
@@ -325,7 +327,7 @@ function setPositionAttribute(glContext: WebGL2RenderingContext, buffers: any, p
     //glContext.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 }
 // Make position buffer for object.
-function initPositionBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObject){
+function initPositionBuffer(glContext: WebGL2RenderingContext, gameObject: GameObject) {
     // Create a buffer for the square's positions.
     const positionBuffer = glContext.createBuffer();
     // Select the positionBuffer as the one to apply buffer
@@ -339,12 +341,12 @@ function initPositionBuffer(glContext: WebGL2RenderingContext,  gameObject: Game
     glContext.bufferData(glContext.ARRAY_BUFFER, new Float32Array(positions), glContext.STATIC_DRAW);
     return positionBuffer;
 }
-interface indexBufferInfo{
+interface indexBufferInfo {
     indexBuffer: WebGLBuffer;
     vertexCount: number;
 }
 // Make vertex buffer for object.
-function initIndexBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObject): indexBufferInfo{
+function initIndexBuffer(glContext: WebGL2RenderingContext, gameObject: GameObject): indexBufferInfo {
     const indexBuffer = glContext.createBuffer();
     glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, indexBuffer);
     // This array defines each face as two triangles, using the
@@ -367,24 +369,24 @@ function initIndexBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObj
 //
 // tell webgl how to pull out the texture coordinates from buffer
 function setTextureAttribute(glContext: WebGL2RenderingContext, buffers: any, programInfo: glProgramInfo) {
-  const num = 2; // every coordinate composed of 2 values
-  const type = glContext.FLOAT; // the data in the buffer is 32-bit float
-  const normalize = false; // don't normalize
-  const stride = 0; // how many bytes to get from one set to the next
-  const offset = 0; // how many bytes inside the buffer to start from
-  glContext.bindBuffer(glContext.ARRAY_BUFFER, buffers.textureCoord);
-  glContext.vertexAttribPointer(
-    programInfo.attribLocations.textureCoord,
-    num,
-    type,
-    normalize,
-    stride,
-    offset,
-  );
-  //glContext.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+    const num = 2; // every coordinate composed of 2 values
+    const type = glContext.FLOAT; // the data in the buffer is 32-bit float
+    const normalize = false; // don't normalize
+    const stride = 0; // how many bytes to get from one set to the next
+    const offset = 0; // how many bytes inside the buffer to start from
+    glContext.bindBuffer(glContext.ARRAY_BUFFER, buffers.textureCoord);
+    glContext.vertexAttribPointer(
+        programInfo.attribLocations.textureCoord,
+        num,
+        type,
+        normalize,
+        stride,
+        offset,
+    );
+    //glContext.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
 }
 // Make texture buffer.
-function initTextureBuffer(glContext: WebGL2RenderingContext,  gameObject: GameObject) {
+function initTextureBuffer(glContext: WebGL2RenderingContext, gameObject: GameObject) {
     const textureCoordBuffer = glContext.createBuffer();
     glContext.bindBuffer(glContext.ARRAY_BUFFER, textureCoordBuffer);
     // Define mapping of texture.

@@ -13,8 +13,6 @@ if (rootEl) {
   rootEl.innerHTML = `
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"></meta>
     <div class="content">
-      <h1>deltavie.github.io</h1>
-      <p>Blue pilled.</p>
       <canvas 
         id="main-canvas" 
         width="1280px" 
